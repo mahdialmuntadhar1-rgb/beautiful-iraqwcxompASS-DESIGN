@@ -29,6 +29,7 @@ const MainContent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [listingFilter, setListingFilter] = useState<{ categoryId: string } | null>(null);
   const [selectedGovernorate, setSelectedGovernorate] = useState('all');
+  const [scrollTrigger, setScrollTrigger] = useState(0);
   const [highContrast, setHighContrast] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('iraq-compass-high-contrast') === 'true';
@@ -73,7 +74,8 @@ const MainContent: React.FC = () => {
     }
   };
 
-  const isAdminRoute = typeof window !== 'undefined' && window.location.pathname === '/admin';
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const isAdminRoute = pathname === '/admin';
 
   if (isAdminRoute) {
     return (
@@ -109,6 +111,10 @@ const MainContent: React.FC = () => {
     setSelectedCategory(null);
   };
 
+  const handleGovernorateChange = (governorate: string) => {
+    setSelectedGovernorate(governorate);
+  };
+
   return (
     <div className="min-h-screen bg-dark-bg text-white">
       <Header
@@ -127,7 +133,8 @@ const MainContent: React.FC = () => {
             <SearchPortal />
             <GovernorateFilter
               selectedGovernorate={selectedGovernorate}
-              onGovernorateChange={setSelectedGovernorate}
+              onGovernorateChange={handleGovernorateChange}
+              onSearchGovernorate={() => setScrollTrigger((prev) => prev + 1)}
             />
             <CategoryGrid
               onCategoryClick={handleCategoryClick}
@@ -139,7 +146,11 @@ const MainContent: React.FC = () => {
             <DealsMarketplace />
             <CommunityStories />
             <CityGuide />
-            <BusinessDirectory />
+            <BusinessDirectory
+              initialFilter={listingFilter ?? undefined}
+              initialGovernorate={selectedGovernorate}
+              scrollTrigger={scrollTrigger}
+            />
             <InclusiveFeatures highContrast={highContrast} setHighContrast={setHighContrast} />
           </>
         )}

@@ -6,9 +6,10 @@ import { Globe } from './icons';
 interface GovernorateFilterProps {
     selectedGovernorate: string;
     onGovernorateChange: (governorateId: string) => void;
+    onSearchGovernorate?: () => void;
 }
 
-export const GovernorateFilter: React.FC<GovernorateFilterProps> = ({ selectedGovernorate, onGovernorateChange }) => {
+export const GovernorateFilter: React.FC<GovernorateFilterProps> = ({ selectedGovernorate, onGovernorateChange, onSearchGovernorate }) => {
     const { t } = useTranslations();
     
     return (
@@ -22,7 +23,10 @@ export const GovernorateFilter: React.FC<GovernorateFilterProps> = ({ selectedGo
                     <select
                         id="governorate-select"
                         value={selectedGovernorate}
-                        onChange={(e) => onGovernorateChange(e.target.value)}
+                        onChange={(e) => {
+                          onGovernorateChange(e.target.value);
+                          onSearchGovernorate?.();
+                        }}
                         className="w-full ps-10 p-3 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 text-white outline-none appearance-none focus:border-primary transition-colors"
                     >
                         {governorates.map(gov => (

@@ -69,13 +69,15 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode }) => {
 
 interface BusinessDirectoryProps {
   initialFilter?: { categoryId: string };
+  initialGovernorate?: string;
+  scrollTrigger?: number;
   onBack?: () => void;
 }
 
-export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFilter, onBack }) => {
+export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFilter, initialGovernorate = 'all', scrollTrigger, onBack }) => {
   const [filters, setFilters] = useState({
     category: initialFilter?.categoryId || 'all',
-    governorate: 'all',
+    governorate: initialGovernorate,
     rating: 0,
   });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -89,6 +91,16 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
   useEffect(() => {
     setFilters(prev => ({ ...prev, category: initialFilter?.categoryId || 'all' }));
   }, [initialFilter]);
+
+  useEffect(() => {
+    setFilters(prev => ({ ...prev, governorate: initialGovernorate }));
+  }, [initialGovernorate]);
+
+  useEffect(() => {
+    if (scrollTrigger === undefined) return;
+    const section = document.getElementById('business-directory');
+    section?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [scrollTrigger]);
 
   const loadBusinesses = useCallback(async () => {
     setIsLoading(true);
@@ -141,7 +153,7 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
-    <section className="py-16">
+    <section id="business-directory" className="py-16">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-center relative mb-8">
           {onBack && (
@@ -172,7 +184,7 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
                 <label className="block text-white/80 text-sm mb-2">{t('filter.governorate')}</label>
                 <select value={filters.governorate} onChange={(e) => setFilters({ ...filters, governorate: e.target.value })} className="w-full px-4 py-3 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 text-white outline-none">
                   {governorates.map((gov) => (
-                    <option key={gov.id} value={gov.value} className="bg-dark-bg">
+                    <option key={gov.id} value={gov.id} className="bg-dark-bg">
                       {t(gov.nameKey)}
                     </option>
                   ))}
