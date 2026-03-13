@@ -15,6 +15,7 @@ import { Dashboard } from './components/Dashboard';
 import { SubcategoryModal } from './components/SubcategoryModal';
 import { GovernorateFilter } from './components/GovernorateFilter';
 import { SearchPortal } from './components/SearchPortal';
+import { AdminHealthCheck } from './components/AdminHealthCheck';
 import { mockUser } from './constants';
 import type { User, Category, Subcategory } from './types';
 import { TranslationProvider } from './hooks/useTranslations';
@@ -36,9 +37,6 @@ const MainContent: React.FC = () => {
   });
 
   useEffect(() => {
-    // In a real application, changing the governorate would trigger
-    // a re-fetch of all data for the components below.
-    // e.g., fetchBusinesses(selectedGovernorate), fetchEvents(selectedGovernorate), etc.
     console.log(`Governorate changed to: ${selectedGovernorate}. Data should be refetched.`);
   }, [selectedGovernorate]);
 
@@ -63,16 +61,36 @@ const MainContent: React.FC = () => {
     setCurrentUser(null);
     setPage('home');
   };
-  
+
   const navigateTo = (targetPage: 'home' | 'dashboard') => {
-      if (targetPage === 'dashboard' && !isLoggedIn) {
-          setShowAuthModal(true);
-      } else {
-          setPage(targetPage);
-          if (targetPage === 'home') {
-            setListingFilter(null);
-          }
+    if (targetPage === 'dashboard' && !isLoggedIn) {
+      setShowAuthModal(true);
+    } else {
+      setPage(targetPage);
+      if (targetPage === 'home') {
+        setListingFilter(null);
       }
+    }
+  };
+
+  const isAdminRoute = typeof window !== 'undefined' && window.location.pathname === '/admin';
+
+  if (isAdminRoute) {
+    return (
+      <div className="min-h-screen bg-dark-bg text-white">
+        <Header
+          isLoggedIn={isLoggedIn}
+          user={currentUser}
+          onSignIn={() => setShowAuthModal(true)}
+          onSignOut={handleLogout}
+          onDashboard={() => navigateTo('dashboard')}
+          onHome={() => navigateTo('home')}
+        />
+        <main>
+          <AdminHealthCheck />
+        </main>
+      </div>
+    );
   }
 
   const handleCategoryClick = (category: Category) => {
@@ -83,8 +101,9 @@ const MainContent: React.FC = () => {
       setPage('listing');
     }
   };
-  
+
   const handleSubcategorySelect = (category: Category, subcategory: Subcategory) => {
+    void subcategory;
     setListingFilter({ categoryId: category.id });
     setPage('listing');
     setSelectedCategory(null);
@@ -92,7 +111,7 @@ const MainContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-dark-bg text-white">
-      <Header 
+      <Header
         isLoggedIn={isLoggedIn}
         user={currentUser}
         onSignIn={() => setShowAuthModal(true)}
@@ -106,12 +125,12 @@ const MainContent: React.FC = () => {
             <HeroSection />
             <StoriesRing />
             <SearchPortal />
-            <GovernorateFilter 
+            <GovernorateFilter
               selectedGovernorate={selectedGovernorate}
               onGovernorateChange={setSelectedGovernorate}
             />
-            <CategoryGrid 
-              onCategoryClick={handleCategoryClick} 
+            <CategoryGrid
+              onCategoryClick={handleCategoryClick}
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
             />
@@ -125,16 +144,16 @@ const MainContent: React.FC = () => {
           </>
         )}
         {page === 'listing' && listingFilter && (
-            <BusinessDirectory 
-                initialFilter={listingFilter} 
-                onBack={() => navigateTo('home')} 
-            />
+          <BusinessDirectory
+            initialFilter={listingFilter}
+            onBack={() => navigateTo('home')}
+          />
         )}
         {page === 'dashboard' && <Dashboard user={currentUser!} onLogout={handleLogout} />}
       </main>
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} onLogin={handleLogin} />}
-      <SubcategoryModal 
-        category={selectedCategory} 
+      <SubcategoryModal
+        category={selectedCategory}
         onClose={() => setSelectedCategory(null)}
         onSubcategorySelect={handleSubcategorySelect}
       />
@@ -142,12 +161,10 @@ const MainContent: React.FC = () => {
   );
 };
 
-const App: React.FC = () => {
-  return (
-    <TranslationProvider>
-      <MainContent />
-    </TranslationProvider>
-  );
-}
+const App: React.FC = () => (
+  <TranslationProvider>
+    <MainContent />
+  </TranslationProvider>
+);
 
 export default App;
