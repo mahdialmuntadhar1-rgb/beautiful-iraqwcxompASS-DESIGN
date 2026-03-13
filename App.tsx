@@ -16,6 +16,7 @@ import { SubcategoryModal } from './components/SubcategoryModal';
 import { GovernorateFilter } from './components/GovernorateFilter';
 import { SearchPortal } from './components/SearchPortal';
 import { AdminHealthCheck } from './components/AdminHealthCheck';
+import { BusinessDetail } from './components/BusinessDetail';
 import { mockUser } from './constants';
 import type { User, Category, Subcategory } from './types';
 import { TranslationProvider } from './hooks/useTranslations';
@@ -29,6 +30,8 @@ const MainContent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [listingFilter, setListingFilter] = useState<{ categoryId: string } | null>(null);
   const [selectedGovernorate, setSelectedGovernorate] = useState('all');
+  const [scrollTrigger, setScrollTrigger] = useState(0);
+  const [pathname, setPathname] = useState(() => window.location.pathname);
   const [highContrast, setHighContrast] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('iraq-compass-high-contrast') === 'true';
@@ -37,8 +40,10 @@ const MainContent: React.FC = () => {
   });
 
   useEffect(() => {
-    console.log(`Governorate changed to: ${selectedGovernorate}. Data should be refetched.`);
-  }, [selectedGovernorate]);
+    const onLocationChange = () => setPathname(window.location.pathname);
+    window.addEventListener('popstate', onLocationChange);
+    return () => window.removeEventListener('popstate', onLocationChange);
+  }, []);
 
   useEffect(() => {
     if (highContrast) {
@@ -60,6 +65,8 @@ const MainContent: React.FC = () => {
     setIsLoggedIn(false);
     setCurrentUser(null);
     setPage('home');
+    window.history.pushState({}, '', '/');
+    setPathname('/');
   };
 
   const navigateTo = (targetPage: 'home' | 'dashboard') => {
@@ -69,11 +76,32 @@ const MainContent: React.FC = () => {
       setPage(targetPage);
       if (targetPage === 'home') {
         setListingFilter(null);
+        window.history.pushState({}, '', '/');
+        setPathname('/');
       }
     }
   };
 
-  const isAdminRoute = typeof window !== 'undefined' && window.location.pathname === '/admin';
+  const isAdminRoute = pathname === '/admin';
+  const businessId = pathname.match(/^\/business\/(.+)/)?.[1];
+
+  if (businessId) {
+    return (
+      <div className="min-h-screen bg-dark-bg text-white">
+        <Header
+          isLoggedIn={isLoggedIn}
+          user={currentUser}
+          onSignIn={() => setShowAuthModal(true)}
+          onSignOut={handleLogout}
+          onDashboard={() => navigateTo('dashboard')}
+          onHome={() => navigateTo('home')}
+        />
+        <main>
+          <BusinessDetail id={businessId} onBack={() => window.history.back()} />
+        </main>
+      </div>
+    );
+  }
 
   if (isAdminRoute) {
     return (
@@ -98,15 +126,24 @@ const MainContent: React.FC = () => {
       setSelectedCategory(category);
     } else {
       setListingFilter({ categoryId: category.id });
-      setPage('listing');
+      setScrollTrigger((prev) => prev + 1);
+      setPage('home');
     }
   };
 
   const handleSubcategorySelect = (category: Category, subcategory: Subcategory) => {
     void subcategory;
     setListingFilter({ categoryId: category.id });
-    setPage('listing');
+    setPage('home');
+    setScrollTrigger((prev) => prev + 1);
     setSelectedCategory(null);
+  };
+
+  const handleGovernorateChange = (governorateId: string) => {
+    setSelectedGovernorate(governorateId);
+    if (governorateId !== 'all') {
+      setScrollTrigger((prev) => prev + 1);
+    }
   };
 
   return (
@@ -127,7 +164,8 @@ const MainContent: React.FC = () => {
             <SearchPortal />
             <GovernorateFilter
               selectedGovernorate={selectedGovernorate}
-              onGovernorateChange={setSelectedGovernorate}
+              onGovernorateChange={handleGovernorateChange}
+              onSearchGovernorate={() => setScrollTrigger((prev) => prev + 1)}
             />
             <CategoryGrid
               onCategoryClick={handleCategoryClick}
@@ -139,13 +177,19 @@ const MainContent: React.FC = () => {
             <DealsMarketplace />
             <CommunityStories />
             <CityGuide />
-            <BusinessDirectory />
+            <BusinessDirectory
+              initialFilter={listingFilter ?? undefined}
+              initialGovernorate={selectedGovernorate}
+              scrollTrigger={scrollTrigger}
+            />
             <InclusiveFeatures highContrast={highContrast} setHighContrast={setHighContrast} />
           </>
         )}
         {page === 'listing' && listingFilter && (
           <BusinessDirectory
             initialFilter={listingFilter}
+            initialGovernorate={selectedGovernorate}
+            scrollTrigger={scrollTrigger}
             onBack={() => navigateTo('home')}
           />
         )}

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { categories, governorates } from '../constants';
 import type { Business } from '../types';
 import { Star, Grid3x3, List, MapPin, ArrowLeft } from './icons';
@@ -11,28 +11,29 @@ const PAGE_SIZE = 50;
 interface BusinessCardProps {
   business: Business;
   viewMode: 'grid' | 'list';
+  onOpenBusiness: (id: string | number) => void;
 }
 
-const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode }) => {
+const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode, onOpenBusiness }) => {
   const { t, lang } = useTranslations();
 
   const displayName = lang === 'ar' && business.nameAr ? business.nameAr :
-                      lang === 'ku' && business.nameKu ? business.nameKu :
-                      business.name;
+    lang === 'ku' && business.nameKu ? business.nameKu :
+      business.name;
 
   const phone = business.phone?.trim();
 
   if (viewMode === 'list') {
     return (
-      <GlassCard className="p-4 flex gap-4 text-start rtl:text-right">
+      <GlassCard as="button" onClick={() => onOpenBusiness(business.id)} className="w-full p-4 flex gap-4 text-start rtl:text-right">
         <div className="flex-1">
           <h3 className="text-white font-semibold text-lg mb-1">{displayName}</h3>
-          <p className="text-white/60 text-sm mb-2">{t(categories.find(c => c.id === business.category)?.nameKey || business.category)}</p>
+          <p className="text-white/60 text-sm mb-2">{t(categories.find((c) => c.id === business.category)?.nameKey || business.category)}</p>
           <div className="flex items-center gap-2 text-sm mb-3">
             <div className="flex items-center gap-1 text-white/70"><MapPin className="w-4 h-4" />{business.city || business.governorate || 'Iraq'}</div>
           </div>
           {phone ? (
-            <a href={`tel:${phone}`} className="text-teal-400 hover:underline">{phone}</a>
+            <a href={`tel:${phone}`} className="text-teal-400 hover:underline" onClick={(event) => event.stopPropagation()}>{phone}</a>
           ) : (
             <span className="text-gray-500 italic text-sm">Phone not available</span>
           )}
@@ -47,13 +48,13 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode }) => {
   }
 
   return (
-    <GlassCard className="overflow-hidden group text-start p-0">
+    <GlassCard as="button" onClick={() => onOpenBusiness(business.id)} className="w-full overflow-hidden group text-start p-0">
       <div className="p-5">
         <h3 className="text-white font-semibold text-lg mb-2">{displayName}</h3>
-        <p className="text-white/60 text-sm mb-2">{t(categories.find(c => c.id === business.category)?.nameKey || business.category)}</p>
+        <p className="text-white/60 text-sm mb-2">{t(categories.find((c) => c.id === business.category)?.nameKey || business.category)}</p>
         <div className="flex items-center gap-1 text-white/60 text-sm mb-3"><MapPin className="w-4 h-4" />{business.city || business.governorate || 'Iraq'}</div>
         {phone ? (
-          <a href={`tel:${phone}`} className="text-teal-400 hover:underline">{phone}</a>
+          <a href={`tel:${phone}`} className="text-teal-400 hover:underline" onClick={(event) => event.stopPropagation()}>{phone}</a>
         ) : (
           <span className="text-gray-500 italic text-sm">Phone not available</span>
         )}
@@ -69,13 +70,15 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode }) => {
 
 interface BusinessDirectoryProps {
   initialFilter?: { categoryId: string };
+  initialGovernorate?: string;
+  scrollTrigger?: number;
   onBack?: () => void;
 }
 
-export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFilter, onBack }) => {
+export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFilter, initialGovernorate = 'all', scrollTrigger = 0, onBack }) => {
   const [filters, setFilters] = useState({
     category: initialFilter?.categoryId || 'all',
-    governorate: 'all',
+    governorate: initialGovernorate,
     rating: 0,
   });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -84,11 +87,33 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [flashCount, setFlashCount] = useState(false);
   const { t } = useTranslations();
+  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setFilters(prev => ({ ...prev, category: initialFilter?.categoryId || 'all' }));
+    setFilters((prev) => ({ ...prev, category: initialFilter?.categoryId || 'all' }));
   }, [initialFilter]);
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, governorate: initialGovernorate }));
+  }, [initialGovernorate]);
+
+  useEffect(() => {
+    if (scrollTrigger > 0) {
+      setTimeout(() => {
+        gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [scrollTrigger]);
+
+  useEffect(() => {
+    if (filters.governorate !== 'all') {
+      setTimeout(() => {
+        gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [filters.governorate]);
 
   const loadBusinesses = useCallback(async () => {
     setIsLoading(true);
@@ -116,10 +141,7 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
       setBusinesses([]);
       setTotalCount(0);
     } else {
-      setBusinesses((data ?? []).map((business) => ({
-        ...business,
-        rating: 0,
-      })) as Business[]);
+      setBusinesses(((data ?? []).map((business) => ({ ...business, rating: 0 })) as Business[]));
       setTotalCount(count ?? 0);
     }
 
@@ -134,11 +156,22 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
     loadBusinesses();
   }, [loadBusinesses]);
 
-  const filteredBusinesses = useMemo(() => {
-    return businesses.filter((business) => business.rating >= filters.rating);
-  }, [businesses, filters.rating]);
+  useEffect(() => {
+    setFlashCount(true);
+    const timer = setTimeout(() => setFlashCount(false), 700);
+    return () => clearTimeout(timer);
+  }, [totalCount]);
+
+  const filteredBusinesses = useMemo(() => businesses.filter((business) => business.rating >= filters.rating), [businesses, filters.rating]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
+  const selectedGovernorateName = governorates.find((gov) => gov.id === filters.governorate)?.nameKey;
+
+  const openBusiness = (id: string | number) => {
+    window.history.pushState({}, '', `/business/${id}`);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
 
   return (
     <section className="py-16">
@@ -161,9 +194,9 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
               <h3 className="text-white font-semibold mb-4 flex items-center justify-between">{t('directory.filters')}<button onClick={() => setFilters({ category: 'all', governorate: 'all', rating: 0 })} className="text-xs text-secondary hover:text-secondary/80">{t('directory.reset')}</button></h3>
               <div className="mb-6">
                 <label className="block text-white/80 text-sm mb-2">{t('directory.category')}</label>
-                <select value={filters.category} onChange={(e) => setFilters({ ...filters, category: e.target.value })} className="w-full px-4 py-3 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 text-white outline-none appearance-none bg-no-repeat bg-right-4" style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'left 0.75rem center', backgroundSize: '1.5em 1.5em' }}>
+                <select value={filters.category} onChange={(e) => setFilters({ ...filters, category: e.target.value })} className="w-full px-4 py-3 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 text-white outline-none appearance-none bg-no-repeat bg-right-4">
                   <option value="all" className="bg-dark-bg">{t('directory.allCategories')}</option>
-                  {categories.map(category => (
+                  {categories.map((category) => (
                     <option key={category.id} value={category.id} className="bg-dark-bg">{t(category.nameKey)}</option>
                   ))}
                 </select>
@@ -172,7 +205,7 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
                 <label className="block text-white/80 text-sm mb-2">{t('filter.governorate')}</label>
                 <select value={filters.governorate} onChange={(e) => setFilters({ ...filters, governorate: e.target.value })} className="w-full px-4 py-3 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 text-white outline-none">
                   {governorates.map((gov) => (
-                    <option key={gov.id} value={gov.id === 'all' ? 'all' : t(gov.nameKey)} className="bg-dark-bg">
+                    <option key={gov.id} value={gov.id} className="bg-dark-bg">
                       {t(gov.nameKey)}
                     </option>
                   ))}
@@ -190,22 +223,52 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
               </div>
             </GlassCard>
           </div>
-          <div className="lg:col-span-3">
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-white/80">{totalCount} {t('directory.businessesFound')}</p>
-              <div className="flex items-center gap-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-1">
+          <div ref={gridRef} className="lg:col-span-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+              <p className={`text-white/80 transition-all duration-500 ${flashCount ? 'text-teal-300 scale-105' : ''}`}>{totalCount} {t('directory.businessesFound')}</p>
+              {selectedGovernorateName && filters.governorate !== 'all' && (
+                <p className="text-xs sm:text-sm text-white/60">{t('filter.governorate')}: {t(selectedGovernorateName)}</p>
+              )}
+              <div className="flex items-center gap-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-1 self-start sm:self-auto">
                 <button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-primary' : 'hover:bg-white/10'}`}><Grid3x3 className="w-5 h-5 text-white" /></button>
                 <button onClick={() => setViewMode('list')} className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-primary' : 'hover:bg-white/10'}`}><List className="w-5 h-5 text-white" /></button>
               </div>
             </div>
-            {isLoading && <p className="text-white/70 mb-4">Loading businesses...</p>}
+            {isLoading && (
+              <div className={viewMode === 'grid' ? 'grid md:grid-cols-2 gap-6' : 'space-y-4'}>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="rounded-2xl bg-white/5 animate-pulse h-48" />
+                ))}
+              </div>
+            )}
             {error && <p className="text-red-300 mb-4">{error}</p>}
-            <div className={viewMode === 'grid' ? 'grid md:grid-cols-2 gap-6' : 'space-y-4'}>
-              {filteredBusinesses.map((business) => (<BusinessCard key={business.id} business={business} viewMode={viewMode} />))}
-            </div>
-            <div className="mt-6 flex items-center justify-between text-sm text-white/80">
+            {!isLoading && !error && filteredBusinesses.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-white/60 text-lg">No businesses found for this filter.</p>
+                <button onClick={() => setFilters({ category: 'all', governorate: 'all', rating: 0 })} className="mt-4 px-6 py-2 rounded-full bg-white/10 text-white hover:bg-white/20">
+                  Clear filters
+                </button>
+              </div>
+            )}
+            {!isLoading && filteredBusinesses.length > 0 && (
+              <div className={viewMode === 'grid' ? 'grid md:grid-cols-2 gap-6' : 'space-y-4'}>
+                {filteredBusinesses.map((business) => (<BusinessCard key={business.id} business={business} viewMode={viewMode} onOpenBusiness={openBusiness} />))}
+              </div>
+            )}
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-white/80">
               <button disabled={page === 0} onClick={() => setPage((prev) => Math.max(0, prev - 1))} className="px-4 py-2 rounded-lg bg-white/10 disabled:opacity-50">Previous</button>
-              <span>Page {page + 1} of {totalPages}</span>
+              <div className="flex items-center gap-2">
+                <span>Page</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={totalPages}
+                  value={page + 1}
+                  onChange={(e) => setPage(Math.min(totalPages - 1, Math.max(0, Number(e.target.value || '1') - 1)))}
+                  className="w-16 text-center px-2 py-1 rounded-lg bg-white/10 text-white border border-white/20"
+                />
+                <span>of {totalPages}</span>
+              </div>
               <button disabled={page >= totalPages - 1} onClick={() => setPage((prev) => Math.min(totalPages - 1, prev + 1))} className="px-4 py-2 rounded-lg bg-white/10 disabled:opacity-50">Next</button>
             </div>
           </div>

@@ -6,10 +6,12 @@ import { Globe } from './icons';
 interface GovernorateFilterProps {
     selectedGovernorate: string;
     onGovernorateChange: (governorateId: string) => void;
+    onSearchGovernorate: () => void;
 }
 
-export const GovernorateFilter: React.FC<GovernorateFilterProps> = ({ selectedGovernorate, onGovernorateChange }) => {
+export const GovernorateFilter: React.FC<GovernorateFilterProps> = ({ selectedGovernorate, onGovernorateChange, onSearchGovernorate }) => {
     const { t } = useTranslations();
+    const selectedGovernorateName = governorates.find((gov) => gov.id === selectedGovernorate);
     
     return (
         <div className="container mx-auto px-4 py-6">
@@ -32,6 +34,17 @@ export const GovernorateFilter: React.FC<GovernorateFilterProps> = ({ selectedGo
                         ))}
                     </select>
                  </div>
+                 {selectedGovernorate !== 'all' && (
+                    <button
+                        onClick={onSearchGovernorate}
+                        className="mt-4 w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold shadow-lg hover:shadow-teal-500/30 transition-all"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        Show businesses in {selectedGovernorateName ? t(selectedGovernorateName.nameKey) : selectedGovernorate}
+                    </button>
+                 )}
             </div>
         </div>
     );
