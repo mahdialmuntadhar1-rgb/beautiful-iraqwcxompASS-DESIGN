@@ -172,7 +172,7 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
                 <label className="block text-white/80 text-sm mb-2">{t('filter.governorate')}</label>
                 <select value={filters.governorate} onChange={(e) => setFilters({ ...filters, governorate: e.target.value })} className="w-full px-4 py-3 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 text-white outline-none">
                   {governorates.map((gov) => (
-                    <option key={gov.id} value={gov.id === 'all' ? 'all' : t(gov.nameKey)} className="bg-dark-bg">
+                    <option key={gov.id} value={gov.value} className="bg-dark-bg">
                       {t(gov.nameKey)}
                     </option>
                   ))}
