@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 import { categories } from '../constants';
 import type { Category } from '../types';
 import { Sparkles } from './icons';
@@ -23,11 +24,31 @@ const ITEMS_PER_PAGE = 9;
 
 export const CategoryGrid: React.FC<CategoryGridProps> = ({ onCategoryClick, currentPage, setCurrentPage }) => {
     const [loading, setLoading] = useState(true);
+    const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
     const { t } = useTranslations();
 
     useEffect(() => {
         const timer = setTimeout(() => setLoading(false), 1500); // Simulate loading time
         return () => clearTimeout(timer);
+    }, []);
+
+    useEffect(() => {
+        const loadCategoryCounts = async () => {
+            const entries = await Promise.all(
+                categories.map(async (category) => {
+                    const { count } = await supabase
+                        .from('directory')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('category', category.id);
+
+                    return [category.id, count ?? 0] as const;
+                })
+            );
+
+            setCategoryCounts(Object.fromEntries(entries));
+        };
+
+        loadCategoryCounts();
     }, []);
 
     const totalPages = Math.ceil(categories.length / ITEMS_PER_PAGE);
@@ -67,7 +88,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({ onCategoryClick, cur
                                     {t(category.nameKey)}
                                 </h3>
                                 <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-xs text-white/80">
-                                    {category.eventCount} {t('categories.events')}
+                                    {categoryCounts[category.id] ?? category.eventCount} {t('categories.events')}
                                 </div>
                                 {category.recommended && (
                                     <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center animate-pulse">

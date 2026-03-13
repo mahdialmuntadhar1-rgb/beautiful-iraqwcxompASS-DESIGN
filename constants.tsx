@@ -48,7 +48,7 @@ export const stories: Story[] = [
 
 // Categories
 export const categories: Category[] = [
-  { id: 'food_drink', icon: <Utensils />, nameKey: 'categories.food_drink', eventCount: 128, recommended: true,
+  { id: 'restaurant', icon: <Utensils />, nameKey: 'categories.food_drink', eventCount: 128, recommended: true,
     subcategories: [
       { id: 'restaurants', icon: <>🍴</>, nameKey: 'subcategories.dining_restaurants', subcategories: [
           { id: 'local_traditional', icon: <>🇮🇶</>, nameKey: 'subcategories.local_traditional', count: 40 },
@@ -67,7 +67,7 @@ export const categories: Category[] = [
       ]},
     ],
   },
-  { id: 'shopping', icon: <ShoppingBag />, nameKey: 'categories.shopping', eventCount: 94,
+  { id: 'supermarket', icon: <ShoppingBag />, nameKey: 'categories.shopping', eventCount: 94,
     subcategories: [
         { id: 'retail_centers', icon: <>🏬</>, nameKey: 'subcategories.shopping_retail_centers', subcategories: [
             { id: 'shopping_malls', icon: <>🛍️</>, nameKey: 'subcategories.shopping_malls', count: 15 },
@@ -90,7 +90,7 @@ export const categories: Category[] = [
         ]},
     ]
   },
-  { id: 'events_entertainment', icon: <Film />, nameKey: 'categories.events_entertainment', eventCount: 72, recommended: true,
+  { id: 'cinema', icon: <Film />, nameKey: 'categories.events_entertainment', eventCount: 72, recommended: true,
     subcategories: [
       { id: 'live_performances', icon: <>🎵</>, nameKey: 'subcategories.live_performances', subcategories: [
           { id: 'music_concerts', icon: <Music />, nameKey: 'subcategories.music_concerts', count: 15 },
@@ -112,7 +112,7 @@ export const categories: Category[] = [
       ]},
     ]
    },
-  { id: 'hotels_stays', icon: <Bed />, nameKey: 'categories.hotels_stays', eventCount: 56,
+  { id: 'fast_food', icon: <Bed />, nameKey: 'categories.hotels_stays', eventCount: 56,
       subcategories: [
       { id: 'hotels_resorts', icon: <>🏙️</>, nameKey: 'subcategories.hotels_resorts', subcategories: [
           { id: 'luxury_5star', icon: <>💎</>, nameKey: 'subcategories.luxury_5star', count: 12 },
@@ -133,7 +133,7 @@ export const categories: Category[] = [
       ]},
     ]
   },
-  { id: 'culture_heritage', icon: <Landmark />, nameKey: 'categories.culture_heritage', eventCount: 41, 
+  { id: 'place_of_worship', icon: <Landmark />, nameKey: 'categories.culture_heritage', eventCount: 41, 
     subcategories: [
         { id: 'historical_sites', icon: <>🏛️</>, nameKey: 'subcategories.historical_sites', subcategories: [
             { id: 'archaeological_sites', icon: <>🏺</>, nameKey: 'subcategories.archaeological_sites', count: 10 },
@@ -157,7 +157,7 @@ export const categories: Category[] = [
         ]},
     ]
   },
-  { id: 'business_services', icon: <Briefcase />, nameKey: 'categories.business_services', eventCount: 45,
+  { id: 'bank', icon: <Briefcase />, nameKey: 'categories.business_services', eventCount: 45,
     subcategories: [
       { id: 'financial_services', icon: <>🏦</>, nameKey: 'subcategories.financial_services', subcategories: [
         { id: 'banks', icon: <>🏦</>, nameKey: 'subcategories.banks', count: 20 },
@@ -181,7 +181,7 @@ export const categories: Category[] = [
       ]},
     ]
   },
-  { id: 'health_wellness', icon: <Hospital />, nameKey: 'categories.health_wellness', eventCount: 35,
+  { id: 'hospital', icon: <Hospital />, nameKey: 'categories.health_wellness', eventCount: 35,
       subcategories: [
       { id: 'medical_services', icon: <>🏥</>, nameKey: 'subcategories.medical_services', subcategories: [
           { id: 'hospitals', icon: <Hospital />, nameKey: 'subcategories.hospitals', count: 15 },
@@ -203,7 +203,7 @@ export const categories: Category[] = [
       ]},
     ]
   },
-  { id: 'transport_mobility', icon: <Car />, nameKey: 'categories.transport_mobility', eventCount: 63, recommended: true,
+  { id: 'car_repair', icon: <Car />, nameKey: 'categories.transport_mobility', eventCount: 63, recommended: true,
     subcategories: [
         { id: 'local_transport', icon: <>🚕</>, nameKey: 'subcategories.local_transport', subcategories: [
             { id: 'taxi_services', icon: <>🚕</>, nameKey: 'subcategories.taxi_services', count: 25 },
@@ -226,7 +226,7 @@ export const categories: Category[] = [
         ]},
     ]
   },
-  { id: 'public_essential', icon: <Landmark />, nameKey: 'categories.public_essential', eventCount: 22,
+  { id: 'school', icon: <Landmark />, nameKey: 'categories.public_essential', eventCount: 22,
     subcategories: [
       { id: 'government_services', icon: <>🏛️</>, nameKey: 'subcategories.public_government_services', subcategories: [
         { id: 'municipal_offices', icon: <>🏢</>, nameKey: 'subcategories.public_municipal_offices', count: 5 },
@@ -876,25 +876,25 @@ export const deals: Deal[] = [
 
 // Governorates
 export const governorates = [
-    { id: 'all', nameKey: 'governorates.all' },
-    { id: 'baghdad', nameKey: 'governorates.baghdad' },
-    { id: 'basra', nameKey: 'governorates.basra' },
-    { id: 'erbil', nameKey: 'governorates.erbil' },
-    { id: 'sulaymaniyah', nameKey: 'governorates.sulaymaniyah' },
-    { id: 'dohuk', nameKey: 'governorates.dohuk' },
-    { id: 'nineveh', nameKey: 'governorates.nineveh' },
-    { id: 'anbar', nameKey: 'governorates.anbar' },
-    { id: 'babil', nameKey: 'governorates.babil' },
-    { id: 'karbala', nameKey: 'governorates.karbala' },
-    { id: 'najaf', nameKey: 'governorates.najaf' },
-    { id: 'qadisiyyah', nameKey: 'governorates.qadisiyyah' },
-    { id: 'wasit', nameKey: 'governorates.wasit' },
-    { id: 'maysan', nameKey: 'governorates.maysan' },
-    { id: 'dhi_qar', nameKey: 'governorates.dhi_qar' },
-    { id: 'muthanna', nameKey: 'governorates.muthanna' },
-    { id: 'diyala', nameKey: 'governorates.diyala' },
-    { id: 'kirkuk', nameKey: 'governorates.kirkuk' },
-    { id: 'salah_al_din', nameKey: 'governorates.salah_al_din' },
+    { id: 'all', value: 'all', nameKey: 'governorates.all' },
+    { id: 'baghdad', value: 'Baghdad', nameKey: 'governorates.baghdad' },
+    { id: 'basra', value: 'Basra', nameKey: 'governorates.basra' },
+    { id: 'erbil', value: 'Erbil', nameKey: 'governorates.erbil' },
+    { id: 'sulaymaniyah', value: 'Sulaymaniyah', nameKey: 'governorates.sulaymaniyah' },
+    { id: 'dohuk', value: 'Duhok', nameKey: 'governorates.dohuk' },
+    { id: 'nineveh', value: 'Nineveh', nameKey: 'governorates.nineveh' },
+    { id: 'anbar', value: 'Al Anbar', nameKey: 'governorates.anbar' },
+    { id: 'babil', value: 'Babil', nameKey: 'governorates.babil' },
+    { id: 'karbala', value: 'Karbala', nameKey: 'governorates.karbala' },
+    { id: 'najaf', value: 'Najaf', nameKey: 'governorates.najaf' },
+    { id: 'qadisiyyah', value: 'Al-Qadisiyyah', nameKey: 'governorates.qadisiyyah' },
+    { id: 'wasit', value: 'Wasit', nameKey: 'governorates.wasit' },
+    { id: 'maysan', value: 'Maysan', nameKey: 'governorates.maysan' },
+    { id: 'dhi_qar', value: 'Dhi Qar', nameKey: 'governorates.dhi_qar' },
+    { id: 'muthanna', value: 'Al Muthanna', nameKey: 'governorates.muthanna' },
+    { id: 'diyala', value: 'Diyala', nameKey: 'governorates.diyala' },
+    { id: 'kirkuk', value: 'Kirkuk', nameKey: 'governorates.kirkuk' },
+    { id: 'salah_al_din', value: 'Salah al-Din', nameKey: 'governorates.salah_al_din' },
 ];
 
 // Intl formatter
