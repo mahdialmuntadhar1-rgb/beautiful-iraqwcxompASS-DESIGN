@@ -1,6 +1,6 @@
 {
-  "name": "Copy of https://github.com/absulysuly/Frontend-Iraqcompast-aistudio",
-  "description": "A futuristic, AI-powered event and business discovery platform for Iraq, featuring a glassmorphic design and multilingual support.",
+  "name": "iraq-compass",
+  "description": "Iraq Compass frontend (Vite + React + TypeScript) connected to Supabase business directory data.",
   "requestFramePermissions": [
     "microphone"
   ]
