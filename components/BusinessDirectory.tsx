@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { categories, governorates } from '../constants';
 import type { Business } from '../types';
 import { Star, Grid3x3, List, MapPin, ArrowLeft } from './icons';
@@ -69,13 +69,20 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode }) => {
 
 interface BusinessDirectoryProps {
   initialFilter?: { categoryId: string };
+  initialGovernorate?: string;
+  scrollTrigger?: number;
   onBack?: () => void;
 }
 
-export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFilter, onBack }) => {
+export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({
+  initialFilter,
+  initialGovernorate = 'all',
+  scrollTrigger = 0,
+  onBack,
+}) => {
   const [filters, setFilters] = useState({
     category: initialFilter?.categoryId || 'all',
-    governorate: 'all',
+    governorate: initialGovernorate,
     rating: 0,
   });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -85,10 +92,26 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslations();
+  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setFilters(prev => ({ ...prev, category: initialFilter?.categoryId || 'all' }));
   }, [initialFilter]);
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, governorate: initialGovernorate }));
+  }, [initialGovernorate]);
+
+  useEffect(() => {
+    if (scrollTrigger > 0) {
+      setTimeout(() => {
+        gridRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 100);
+    }
+  }, [scrollTrigger]);
 
   const loadBusinesses = useCallback(async () => {
     setIsLoading(true);
@@ -172,7 +195,7 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
                 <label className="block text-white/80 text-sm mb-2">{t('filter.governorate')}</label>
                 <select value={filters.governorate} onChange={(e) => setFilters({ ...filters, governorate: e.target.value })} className="w-full px-4 py-3 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 text-white outline-none">
                   {governorates.map((gov) => (
-                    <option key={gov.id} value={gov.value} className="bg-dark-bg">
+                    <option key={gov.id} value={gov.id} className="bg-dark-bg">
                       {t(gov.nameKey)}
                     </option>
                   ))}
@@ -190,7 +213,7 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
               </div>
             </GlassCard>
           </div>
-          <div className="lg:col-span-3">
+          <div ref={gridRef} className="lg:col-span-3">
             <div className="flex items-center justify-between mb-6">
               <p className="text-white/80">{totalCount} {t('directory.businessesFound')}</p>
               <div className="flex items-center gap-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl p-1">
@@ -199,10 +222,15 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
               </div>
             </div>
             {isLoading && <p className="text-white/70 mb-4">Loading businesses...</p>}
-            {error && <p className="text-red-300 mb-4">{error}</p>}
-            <div className={viewMode === 'grid' ? 'grid md:grid-cols-2 gap-6' : 'space-y-4'}>
-              {filteredBusinesses.map((business) => (<BusinessCard key={business.id} business={business} viewMode={viewMode} />))}
-            </div>
+            {error ? (
+              <div className="text-center py-16 text-red-300">
+                Failed to load businesses. Please refresh.
+              </div>
+            ) : (
+              <div className={viewMode === 'grid' ? 'grid md:grid-cols-2 gap-6' : 'space-y-4'}>
+                {filteredBusinesses.map((business) => (<BusinessCard key={business.id} business={business} viewMode={viewMode} />))}
+              </div>
+            )}
             <div className="mt-6 flex items-center justify-between text-sm text-white/80">
               <button disabled={page === 0} onClick={() => setPage((prev) => Math.max(0, prev - 1))} className="px-4 py-2 rounded-lg bg-white/10 disabled:opacity-50">Previous</button>
               <span>Page {page + 1} of {totalPages}</span>
