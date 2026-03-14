@@ -69,13 +69,20 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode }) => {
 
 interface BusinessDirectoryProps {
   initialFilter?: { categoryId: string };
+  initialGovernorate?: string;
+  scrollTrigger?: number;
   onBack?: () => void;
 }
 
-export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFilter, onBack }) => {
+export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({
+  initialFilter,
+  initialGovernorate = 'all',
+  scrollTrigger,
+  onBack,
+}) => {
   const [filters, setFilters] = useState({
     category: initialFilter?.categoryId || 'all',
-    governorate: 'all',
+    governorate: initialGovernorate,
     rating: 0,
   });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -89,6 +96,10 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
   useEffect(() => {
     setFilters(prev => ({ ...prev, category: initialFilter?.categoryId || 'all' }));
   }, [initialFilter]);
+
+  useEffect(() => {
+    setFilters(prev => ({ ...prev, governorate: initialGovernorate }));
+  }, [initialGovernorate]);
 
   const loadBusinesses = useCallback(async () => {
     setIsLoading(true);
@@ -134,6 +145,13 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
     loadBusinesses();
   }, [loadBusinesses]);
 
+  useEffect(() => {
+    if (typeof scrollTrigger === 'number') {
+      setPage(0);
+      loadBusinesses();
+    }
+  }, [scrollTrigger, loadBusinesses]);
+
   const filteredBusinesses = useMemo(() => {
     return businesses.filter((business) => business.rating >= filters.rating);
   }, [businesses, filters.rating]);
@@ -172,7 +190,7 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
                 <label className="block text-white/80 text-sm mb-2">{t('filter.governorate')}</label>
                 <select value={filters.governorate} onChange={(e) => setFilters({ ...filters, governorate: e.target.value })} className="w-full px-4 py-3 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 text-white outline-none">
                   {governorates.map((gov) => (
-                    <option key={gov.id} value={gov.value} className="bg-dark-bg">
+                    <option key={gov.id} value={gov.id} className="bg-dark-bg">
                       {t(gov.nameKey)}
                     </option>
                   ))}
