@@ -1,10 +1,10 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { categories, governorates } from '../constants';
 import type { Business } from '../types';
 import { Star, Grid3x3, List, MapPin, ArrowLeft } from './icons';
 import { useTranslations } from '../hooks/useTranslations';
 import { GlassCard } from './GlassCard';
-import { supabase } from '../lib/supabase';
+import { useBusinesses } from '../hooks/useBusinesses';
 
 const PAGE_SIZE = 50;
 
@@ -79,65 +79,20 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
     rating: 0,
   });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [businesses, setBusinesses] = useState<Business[]>([]);
   const [page, setPage] = useState(0);
-  const [totalCount, setTotalCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { t } = useTranslations();
 
   useEffect(() => {
     setFilters(prev => ({ ...prev, category: initialFilter?.categoryId || 'all' }));
   }, [initialFilter]);
 
-  const loadBusinesses = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-
-    let query = supabase
-      .from('directory')
-      .select('id, name, city, governorate, category, phone, lat, lng', { count: 'exact' });
-
-    if (filters.governorate !== 'all') {
-      query = query.eq('governorate', filters.governorate);
-    }
-
-    if (filters.category !== 'all') {
-      query = query.eq('category', filters.category);
-    }
-
-    const from = page * PAGE_SIZE;
-    const to = from + PAGE_SIZE - 1;
-
-    const { data, error: fetchError, count } = await query.range(from, to);
-
-    if (fetchError) {
-      setError(fetchError.message);
-      setBusinesses([]);
-      setTotalCount(0);
-    } else {
-      setBusinesses((data ?? []).map((business) => ({
-        ...business,
-        rating: 0,
-      })) as Business[]);
-      setTotalCount(count ?? 0);
-    }
-
-    setIsLoading(false);
-  }, [filters.category, filters.governorate, page]);
-
   useEffect(() => {
     setPage(0);
-  }, [filters.category, filters.governorate]);
+  }, [filters.category, filters.governorate, filters.rating]);
 
-  useEffect(() => {
-    loadBusinesses();
-  }, [loadBusinesses]);
+  const { businesses, totalCount, isLoading, error, usingMockData } = useBusinesses(filters, page, PAGE_SIZE);
 
-  const filteredBusinesses = useMemo(() => {
-    return businesses.filter((business) => business.rating >= filters.rating);
-  }, [businesses, filters.rating]);
-
+  const filteredBusinesses = useMemo(() => businesses, [businesses]);
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
@@ -199,7 +154,8 @@ export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFil
               </div>
             </div>
             {isLoading && <p className="text-white/70 mb-4">Loading businesses...</p>}
-            {error && <p className="text-red-300 mb-4">{error}</p>}
+            {error && <p className="text-yellow-300 mb-4">{error}</p>}
+            {usingMockData && <p className="text-white/60 mb-4">Using fallback mock data.</p>}
             <div className={viewMode === 'grid' ? 'grid md:grid-cols-2 gap-6' : 'space-y-4'}>
               {filteredBusinesses.map((business) => (<BusinessCard key={business.id} business={business} viewMode={viewMode} />))}
             </div>
