@@ -1,5 +1,16 @@
 import type React from 'react';
 
+export type TabType = 'shakumaku' | 'madinaty';
+
+export interface Governorate {
+  id: string;
+  name: {
+    en: string;
+    ar: string;
+    ku: string;
+  };
+}
+
 export interface Story {
   id: number;
   avatar: string;
@@ -76,6 +87,7 @@ export interface Event {
   venue: string;
   attendees: number;
   price: number;
+  governorate?: string;
   accessibility?: {
     wheelchairAccessible?: boolean;
     familyFriendly?: boolean;
@@ -95,12 +107,20 @@ export interface Deal {
   expiresIn: string;
   claimed: number;
   total: number;
+  governorate?: string;
 }
 
 export interface User {
-  name: string;
-  email: string;
-  avatar: string;
+  id: string;
+  email?: string;
+  phone?: string;
+  display_name: string;
+  display_name_ar?: string;
+  display_name_ku?: string;
+  avatar_url?: string;
+  governorate?: string;
+  role: 'user' | 'business_owner' | 'admin';
+  created_at?: string;
 }
 
 export interface HeroSlide {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { User } from '../types';
-import { Sparkles, User as UserIcon } from './icons';
+import { Sparkles, User as UserIcon, Bell } from './icons';
 import { useTranslations } from '../hooks/useTranslations';
 import { LanguageSelector } from './LanguageSelector';
 
@@ -24,8 +24,14 @@ export const Header: React.FC<HeaderProps> = ({ isLoggedIn, user, onSignIn, onSi
                     <Sparkles className="text-primary" />
                     Iraq<span className="text-secondary">Compass</span>
                 </button>
-                <nav className="flex items-center gap-4 rtl:flex-row-reverse">
+                <nav className="flex items-center gap-3 rtl:flex-row-reverse">
                     <LanguageSelector />
+                    
+                    <button className="p-2 rounded-full bg-white/5 text-[#e8dcc8]/60 hover:text-[#d4af37] transition-colors relative">
+                        <Bell className="w-6 h-6" />
+                        <span className="absolute top-2 right-2 w-2 h-2 bg-[#d4af37] rounded-full border border-[#0a0e1a]" />
+                    </button>
+
                     {isLoggedIn && user ? (
                         <div className="relative">
                             <button onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-3 p-2 rounded-full bg-glass-surface hover:bg-glass-hover border border-glass-border transition-colors">

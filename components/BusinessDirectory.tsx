@@ -63,22 +63,33 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business, viewMode }) => {
 interface BusinessDirectoryProps {
     initialFilter?: { categoryId: string };
     onBack?: () => void;
+    governorate?: string;
+    category?: string;
 }
 
-export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFilter, onBack }) => {
-  const [filters, setFilters] = useState({ category: initialFilter?.categoryId || 'all', rating: 0 });
+export const BusinessDirectory: React.FC<BusinessDirectoryProps> = ({ initialFilter, onBack, governorate = 'all', category = 'all' }) => {
+  const [filters, setFilters] = useState({ 
+    category: initialFilter?.categoryId || category || 'all', 
+    rating: 0,
+    governorate: governorate || 'all'
+  });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const { t } = useTranslations();
 
   useEffect(() => {
-    setFilters(prev => ({...prev, category: initialFilter?.categoryId || 'all'}));
-  }, [initialFilter]);
+    setFilters(prev => ({
+      ...prev, 
+      category: initialFilter?.categoryId || category || 'all',
+      governorate: governorate || 'all'
+    }));
+  }, [initialFilter, category, governorate]);
 
   const filteredBusinesses = useMemo(() => {
     return businesses.filter(business => {
       const categoryMatch = filters.category === 'all' || business.category === filters.category;
+      const governorateMatch = filters.governorate === 'all' || business.governorate?.toLowerCase() === filters.governorate.toLowerCase();
       const ratingMatch = business.rating >= filters.rating;
-      return categoryMatch && ratingMatch;
+      return categoryMatch && governorateMatch && ratingMatch;
     });
   }, [filters]);
 

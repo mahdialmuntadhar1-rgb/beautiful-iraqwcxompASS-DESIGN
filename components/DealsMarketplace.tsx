@@ -3,8 +3,18 @@ import { deals } from '../constants';
 import { Clock, Tag } from './icons';
 import { useTranslations } from '../hooks/useTranslations';
 
-export const DealsMarketplace: React.FC = () => {
+interface DealsMarketplaceProps {
+  governorate?: string;
+}
+
+export const DealsMarketplace: React.FC<DealsMarketplaceProps> = ({ governorate = 'all' }) => {
   const { t } = useTranslations();
+
+  const filteredDeals = deals.filter(d => {
+    return governorate === 'all' || d.governorate?.toLowerCase() === governorate.toLowerCase();
+  });
+
+  if (filteredDeals.length === 0) return null;
 
   return (
     <section className="py-16 relative">
@@ -15,7 +25,7 @@ export const DealsMarketplace: React.FC = () => {
       <div className="container mx-auto px-4 relative z-10">
         <h2 className="text-3xl font-bold text-white mb-8 text-center">{t('deals.title')}</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {deals.map((deal) => (
+          {filteredDeals.map((deal) => (
             <div key={deal.id} className="relative group backdrop-blur-xl bg-gradient-to-br from-accent/10 to-primary/10 border border-white/10 rounded-2xl p-6 hover:border-accent/50 hover:shadow-glow-accent transition-all duration-300 overflow-hidden text-start">
               <div className="absolute top-0 end-0 w-24 h-24">
                 <div className="absolute top-0 end-0 w-full h-full bg-gradient-to-br from-accent to-primary transform rtl:-rotate-45 ltr:rotate-45 rtl:-translate-x-8 ltr:translate-x-8 -translate-y-8"></div>

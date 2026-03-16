@@ -4,8 +4,22 @@ import { Crown, Star, MapPin, Clock } from './icons';
 import { useTranslations } from '../hooks/useTranslations';
 import { GlassCard } from './GlassCard';
 
-export const FeaturedBusinesses: React.FC = () => {
+interface FeaturedBusinessesProps {
+  governorate?: string;
+  category?: string;
+}
+
+export const FeaturedBusinesses: React.FC<FeaturedBusinessesProps> = ({ governorate = 'all', category = 'all' }) => {
   const { t, lang } = useTranslations();
+
+  const filtered = businesses.filter(b => {
+    const isFeatured = b.isFeatured || b.isPremium;
+    const matchesGov = governorate === 'all' || b.governorate?.toLowerCase() === governorate.toLowerCase();
+    const matchesCat = category === 'all' || b.category === category;
+    return isFeatured && matchesGov && matchesCat;
+  });
+
+  if (filtered.length === 0) return null;
 
   return (
     <section className="py-16 relative overflow-hidden">
@@ -15,7 +29,7 @@ export const FeaturedBusinesses: React.FC = () => {
           {t('featured.title')}
         </h2>
         <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
-          {businesses.filter(b => b.isFeatured || b.isPremium).map((business) => {
+          {filtered.map((business) => {
             const displayName = lang === 'ar' && business.nameAr ? business.nameAr : 
                                 lang === 'ku' && business.nameKu ? business.nameKu : 
                                 business.name;

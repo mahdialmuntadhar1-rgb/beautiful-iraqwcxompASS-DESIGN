@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { events, format } from '../constants';
 import type { Event } from '../types';
 import { Sparkles, MapPin, Clock, Users } from './icons';
@@ -14,22 +14,25 @@ const shuffle = <T,>(array: T[]): T[] => {
   return newArray;
 };
 
-export const PersonalizedEvents: React.FC = () => {
+interface PersonalizedEventsProps {
+  governorate?: string;
+}
+
+export const PersonalizedEvents: React.FC<PersonalizedEventsProps> = ({ governorate = 'all' }) => {
   const [activeTab, setActiveTab] = useState('forYou');
-  const [displayedEvents, setDisplayedEvents] = useState<Event[]>(events);
   const { t } = useTranslations();
 
-  useEffect(() => {
-    // To simulate fetching different data for each tab, we shuffle the events.
-    // In a real app, you would fetch data here based on `activeTab`.
-    // We reset to the original order for the "forYou" tab.
-    if (activeTab === 'forYou') {
-        setDisplayedEvents(events);
-    } else {
-        setDisplayedEvents(shuffle(events));
+  const filteredEvents = useMemo(() => {
+    let baseEvents = events;
+    if (governorate !== 'all') {
+      baseEvents = events.filter(e => e.governorate?.toLowerCase() === governorate.toLowerCase());
     }
-  }, [activeTab]);
+    
+    if (activeTab === 'forYou') return baseEvents;
+    return shuffle(baseEvents);
+  }, [activeTab, governorate]);
 
+  if (filteredEvents.length === 0) return null;
 
   return (
     <section className="py-16">
@@ -49,14 +52,7 @@ export const PersonalizedEvents: React.FC = () => {
           ))}
         </div>
         <div key={activeTab} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-grid">
-            <style>{`
-                @keyframes fade-in-grid {
-                    from { opacity: 0; transform: translateY(1rem); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                .animate-fade-in-grid { animation: fade-in-grid 0.5s ease-in-out forwards; }
-            `}</style>
-          {displayedEvents.map((event) => (
+          {filteredEvents.map((event) => (
             <GlassCard key={event.id} className="group relative overflow-hidden hover:shadow-glow-primary hover:-translate-y-2 text-start p-0">
               <div className="relative h-56 overflow-hidden">
                 <img src={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />

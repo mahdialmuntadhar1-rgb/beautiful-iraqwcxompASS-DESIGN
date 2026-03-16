@@ -1,6 +1,6 @@
 {
-  "name": "mahdialmuntadhar1-rgb/beautiful-iraqwcxompASS-DESIGN on main",
-  "description": "A futuristic, AI-powered event and business discovery platform for Iraq, featuring a glassmorphic design and multilingual support.",
+  "name": "Iraq Compass",
+  "description": "A futuristic, AI-powered social and business discovery platform for Iraq, featuring real-time community updates and local business directories.",
   "requestFramePermissions": [
     "microphone"
   ]

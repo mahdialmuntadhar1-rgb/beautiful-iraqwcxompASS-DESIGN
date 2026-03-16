@@ -1,5 +1,5 @@
 import React from 'react';
-import type { User, Story, Category, Business, Event, Deal, HeroSlide } from './types';
+import type { User, Story, Category, Business, Event, Deal, HeroSlide, Governorate } from './types';
 // FIX: Added 'Briefcase' to the import list from './components/icons' to make it available for use in this file.
 import {
   Utensils, Coffee, ShoppingBag, Bed, Film, Music, Palette, Dumbbell, Car,
@@ -7,11 +7,46 @@ import {
   Grid3x3
 } from './components/icons';
 
+// Governorates
+export const governorates: Governorate[] = [
+  { id: 'all', name: { en: 'All Iraq', ar: 'كل العراق', ku: 'هەموو عێراق' } },
+  { id: 'sulaymaniyah', name: { en: 'Sulaymaniyah', ar: 'السليمانية', ku: 'سلێمانی' } },
+  { id: 'erbil', name: { en: 'Erbil', ar: 'أربيل', ku: 'هەولێر' } },
+  { id: 'baghdad', name: { en: 'Baghdad', ar: 'بغداد', ku: 'بەغدا' } },
+  { id: 'basra', name: { en: 'Basra', ar: 'البصرة', ku: 'بەسرە' } },
+  { id: 'duhok', name: { en: 'Duhok', ar: 'دهوك', ku: 'دهۆک' } },
+  { id: 'kirkuk', name: { en: 'Kirkuk', ar: 'كركوك', ku: 'کەرکووک' } },
+  { id: 'najaf', name: { en: 'Najaf', ar: 'النجف', ku: 'نەجەف' } },
+  { id: 'mosul', name: { en: 'Mosul', ar: 'الموصل', ku: 'مووسڵ' } },
+  { id: 'karbala', name: { en: 'Karbala', ar: 'كربلاء', ku: 'کەربەلا' } },
+  { id: 'anbar', name: { en: 'Anbar', ar: 'الأنبار', ku: 'ئەنبار' } },
+];
+
+// Madinaty Category Filters
+export const madinatyCategories = [
+  { id: 'all', icon: '✦', nameKey: 'madinaty.categories.all' },
+  { id: 'restaurants', icon: '🍽', nameKey: 'madinaty.categories.restaurants' },
+  { id: 'cafes', icon: '☕', nameKey: 'madinaty.categories.cafes' },
+  { id: 'health', icon: '🏥', nameKey: 'madinaty.categories.health' },
+  { id: 'shopping', icon: '🛍', nameKey: 'madinaty.categories.shopping' },
+  { id: 'events', icon: '🎉', nameKey: 'madinaty.categories.events' },
+  { id: 'ngos', icon: '🤝', nameKey: 'madinaty.categories.ngos' },
+  { id: 'services', icon: '⚡', nameKey: 'madinaty.categories.services' },
+  { id: 'government', icon: '🏛', nameKey: 'madinaty.categories.government' },
+  { id: 'hotels', icon: '🏨', nameKey: 'madinaty.categories.hotels' },
+  { id: 'education', icon: '🎓', nameKey: 'madinaty.categories.education' },
+  { id: 'pharmacy', icon: '💊', nameKey: 'madinaty.categories.pharmacy' },
+  { id: 'gym', icon: '🏋', nameKey: 'madinaty.categories.gym' },
+  { id: 'repair', icon: '🔧', nameKey: 'madinaty.categories.repair' },
+];
+
 // Mock User
 export const mockUser: User = {
-  name: 'Salar Ali',
+  id: 'mock-123',
+  display_name: 'Salar Ali',
   email: 'salar.ali@example.com',
-  avatar: 'https://i.pravatar.cc/150?u=salarali',
+  avatar_url: 'https://i.pravatar.cc/150?u=salarali',
+  role: 'user',
 };
 
 // Hero Slides
@@ -859,42 +894,19 @@ export const businesses: Business[] = [
 
 // Events
 export const events: Event[] = [
-  { id: 1, image: 'https://picsum.photos/seed/e1/600/400', title: 'Baghdad International Flower Festival', aiRecommended: true, date: new Date(new Date().setDate(new Date().getDate() + 3)), venue: 'Al-Zawraa Park, Baghdad', attendees: 1200, price: 0, accessibility: { wheelchairAccessible: true, familyFriendly: true } },
-  { id: 2, image: 'https://picsum.photos/seed/e2/600/400', title: 'Kurdistan Tech Conference 2024', date: new Date(new Date().setDate(new Date().getDate() + 10)), venue: 'Erbil International Fair', attendees: 850, price: 25000, accessibility: { wheelchairAccessible: true, signLanguage: true } },
-  { id: 3, image: 'https://picsum.photos/seed/e3/600/400', title: 'Traditional Iraqi Music Night', aiRecommended: true, date: new Date(new Date().setDate(new Date().getDate() + 5)), venue: 'Rashid Street, Baghdad', attendees: 300, price: 10000, accessibility: { audioDescription: true } },
-  { id: 4, image: 'https://picsum.photos/seed/e4/600/400', title: 'Slemani International Book Fair', date: new Date(new Date().setDate(new Date().getDate() + 20)), venue: 'Slemani Expo Center', attendees: 5000, price: 5000, accessibility: { familyFriendly: true, wheelchairAccessible: true } },
-  { id: 5, image: 'https://picsum.photos/seed/e5/600/400', title: 'Women in Business Networking Event', date: new Date(new Date().setDate(new Date().getDate() + 7)), venue: 'The Station, Baghdad', attendees: 150, price: 15000, accessibility: { womenOnly: true } },
-  { id: 6, image: 'https://picsum.photos/seed/e6/600/400', title: 'Family Fun Day at the Park', date: new Date(new Date().setDate(new Date().getDate() + 2)), venue: 'Sami Abdulrahman Park, Erbil', attendees: 700, price: 0, accessibility: { familyFriendly: true, sensoryFriendly: true } },
+  { id: 1, image: 'https://picsum.photos/seed/e1/600/400', title: 'Baghdad International Flower Festival', aiRecommended: true, date: new Date(new Date().setDate(new Date().getDate() + 3)), venue: 'Al-Zawraa Park, Baghdad', attendees: 1200, price: 0, accessibility: { wheelchairAccessible: true, familyFriendly: true }, governorate: 'Baghdad' },
+  { id: 2, image: 'https://picsum.photos/seed/e2/600/400', title: 'Kurdistan Tech Conference 2024', date: new Date(new Date().setDate(new Date().getDate() + 10)), venue: 'Erbil International Fair', attendees: 850, price: 25000, accessibility: { wheelchairAccessible: true, signLanguage: true }, governorate: 'Erbil' },
+  { id: 3, image: 'https://picsum.photos/seed/e3/600/400', title: 'Traditional Iraqi Music Night', aiRecommended: true, date: new Date(new Date().setDate(new Date().getDate() + 5)), venue: 'Rashid Street, Baghdad', attendees: 300, price: 10000, accessibility: { audioDescription: true }, governorate: 'Baghdad' },
+  { id: 4, image: 'https://picsum.photos/seed/e4/600/400', title: 'Slemani International Book Fair', date: new Date(new Date().setDate(new Date().getDate() + 20)), venue: 'Slemani Expo Center', attendees: 5000, price: 5000, accessibility: { familyFriendly: true, wheelchairAccessible: true }, governorate: 'Sulaymaniyah' },
+  { id: 5, image: 'https://picsum.photos/seed/e5/600/400', title: 'Women in Business Networking Event', date: new Date(new Date().setDate(new Date().getDate() + 7)), venue: 'The Station, Baghdad', attendees: 150, price: 15000, accessibility: { womenOnly: true }, governorate: 'Baghdad' },
+  { id: 6, image: 'https://picsum.photos/seed/e6/600/400', title: 'Family Fun Day at the Park', date: new Date(new Date().setDate(new Date().getDate() + 2)), venue: 'Sami Abdulrahman Park, Erbil', attendees: 700, price: 0, accessibility: { familyFriendly: true, sensoryFriendly: true }, governorate: 'Erbil' },
 ];
 
 // Deals
 export const deals: Deal[] = [
-  { id: 1, discount: 25, businessLogo: 'https://picsum.photos/seed/bl1/64/64', title: 'Off on All Main Courses', description: 'Enjoy a delicious discount at Zaytona Restaurant.', expiresIn: '3 Days', claimed: 78, total: 200 },
-  { id: 2, discount: 50, businessLogo: 'https://picsum.photos/seed/bl2/64/64', title: 'Off Your First Month', description: 'Join Fitness World Gym and get half price.', expiresIn: '1 Week', claimed: 112, total: 150 },
-  { id: 3, discount: 15, businessLogo: 'https://picsum.photos/seed/bl3/64/64', title: 'Off All Electronics', description: 'TechCity summer sale is here. Don\'t miss out!', expiresIn: '5 Days', claimed: 204, total: 500 },
-];
-
-// Governorates
-export const governorates = [
-    { id: 'all', nameKey: 'governorates.all' },
-    { id: 'baghdad', nameKey: 'governorates.baghdad' },
-    { id: 'basra', nameKey: 'governorates.basra' },
-    { id: 'erbil', nameKey: 'governorates.erbil' },
-    { id: 'sulaymaniyah', nameKey: 'governorates.sulaymaniyah' },
-    { id: 'dohuk', nameKey: 'governorates.dohuk' },
-    { id: 'nineveh', nameKey: 'governorates.nineveh' },
-    { id: 'anbar', nameKey: 'governorates.anbar' },
-    { id: 'babil', nameKey: 'governorates.babil' },
-    { id: 'karbala', nameKey: 'governorates.karbala' },
-    { id: 'najaf', nameKey: 'governorates.najaf' },
-    { id: 'qadisiyyah', nameKey: 'governorates.qadisiyyah' },
-    { id: 'wasit', nameKey: 'governorates.wasit' },
-    { id: 'maysan', nameKey: 'governorates.maysan' },
-    { id: 'dhi_qar', nameKey: 'governorates.dhi_qar' },
-    { id: 'muthanna', nameKey: 'governorates.muthanna' },
-    { id: 'diyala', nameKey: 'governorates.diyala' },
-    { id: 'kirkuk', nameKey: 'governorates.kirkuk' },
-    { id: 'salah_al_din', nameKey: 'governorates.salah_al_din' },
+  { id: 1, discount: 25, businessLogo: 'https://picsum.photos/seed/bl1/64/64', title: 'Off on All Main Courses', description: 'Enjoy a delicious discount at Zaytona Restaurant.', expiresIn: '3 Days', claimed: 78, total: 200, governorate: 'Baghdad' },
+  { id: 2, discount: 50, businessLogo: 'https://picsum.photos/seed/bl2/64/64', title: 'Off Your First Month', description: 'Join Fitness World Gym and get half price.', expiresIn: '1 Week', claimed: 112, total: 150, governorate: 'Erbil' },
+  { id: 3, discount: 15, businessLogo: 'https://picsum.photos/seed/bl3/64/64', title: 'Off All Electronics', description: 'TechCity summer sale is here. Don\'t miss out!', expiresIn: '5 Days', claimed: 204, total: 500, governorate: 'Sulaymaniyah' },
 ];
 
 // Intl formatter
@@ -923,6 +935,45 @@ export const inclusiveFeaturesList = [
 // Translations
 export const translations = {
   en: {
+    common: {
+        allIraq: "All Iraq",
+        whatsHappeningIn: "What's happening in",
+        noResults: "No businesses found in this area yet",
+        businessesFound: "businesses found",
+        shakumaku: "Shakumaku",
+        madinaty: "Madinaty",
+    },
+    nav: {
+        feed: "Feed",
+        city: "City",
+        search: "Search",
+        profile: "Profile",
+    },
+    madinaty: {
+        categories: {
+            all: "All",
+            restaurants: "Restaurants",
+            cafes: "Cafés",
+            health: "Health",
+            shopping: "Shopping",
+            events: "Events",
+            ngos: "NGOs",
+            services: "Services",
+            government: "Government",
+            hotels: "Hotels",
+            education: "Education",
+            pharmacy: "Pharmacy",
+            gym: "Gym",
+            repair: "Repair",
+        }
+    },
+    shakumaku: {
+        filters: {
+            allPosts: "All Posts",
+            businesses: "Businesses",
+            people: "People",
+        }
+    },
     items: "items",
     header: {
         signIn: "Sign In",
@@ -1265,6 +1316,45 @@ export const translations = {
     }
   },
   ar: {
+    common: {
+        allIraq: "كل العراق",
+        whatsHappeningIn: "ماذا يحدث في",
+        noResults: "لم يتم العثور على أعمال في هذه المنطقة بعد",
+        businessesFound: "أعمال تم العثور عليها",
+        shakumaku: "شكو ماكو",
+        madinaty: "مدينتي",
+    },
+    nav: {
+        feed: "الرئيسية",
+        city: "مدينتي",
+        search: "بحث",
+        profile: "حسابي",
+    },
+    madinaty: {
+        categories: {
+            all: "الكل",
+            restaurants: "مطاعم",
+            cafes: "مقاهي",
+            health: "صحة",
+            shopping: "تسوق",
+            events: "فعاليات",
+            ngos: "منظمات",
+            services: "خدمات",
+            government: "حكومة",
+            hotels: "فنادق",
+            education: "تعليم",
+            pharmacy: "صيدلية",
+            gym: "صالة رياضية",
+            repair: "تصليح",
+        }
+    },
+    shakumaku: {
+        filters: {
+            allPosts: "كل المنشورات",
+            businesses: "أعمال",
+            people: "أشخاص",
+        }
+    },
     items: "عناصر",
     header: {
         signIn: "تسجيل الدخول",
@@ -1607,6 +1697,45 @@ export const translations = {
     }
   },
   ku: {
+    common: {
+        allIraq: "هەموو عێراق",
+        whatsHappeningIn: "چی ڕوودەدات لە",
+        noResults: "هیچ کارێک لەم ناوچەیەدا نەدۆزرایەوە",
+        businessesFound: "کار دۆزرایەوە",
+        shakumaku: "شەکۆماکۆ",
+        madinaty: "مەدینەتی",
+    },
+    nav: {
+        feed: "سەرەکی",
+        city: "شارەکەم",
+        search: "گەڕان",
+        profile: "هەژمارەکەم",
+    },
+    madinaty: {
+        categories: {
+            all: "هەموو",
+            restaurants: "چێشتخانەکان",
+            cafes: "کافێکان",
+            health: "تەندروستی",
+            shopping: "بازاڕکردن",
+            events: "بۆنەکان",
+            ngos: "ڕێکخراوەکان",
+            services: "خزمەتگوزارییەکان",
+            government: "حکومی",
+            hotels: "هۆتێلەکان",
+            education: "پەروەردە",
+            pharmacy: "دەرمانخانە",
+            gym: "هۆڵی وەرزش",
+            repair: "چاککردنەوە",
+        }
+    },
+    shakumaku: {
+        filters: {
+            allPosts: "هەموو پۆستەکان",
+            businesses: "کارەکان",
+            people: "کەسەکان",
+        }
+    },
     items: "شتەکان",
     header: {
         signIn: "چوونەژوورەوە",
