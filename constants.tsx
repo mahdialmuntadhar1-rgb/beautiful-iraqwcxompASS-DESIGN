@@ -35,18 +35,13 @@ export const madinatyCategories = [
   { id: 'government', icon: '🏛', nameKey: 'madinaty.categories.government' },
   { id: 'hotels', icon: '🏨', nameKey: 'madinaty.categories.hotels' },
   { id: 'education', icon: '🎓', nameKey: 'madinaty.categories.education' },
-  { id: 'pharmacy', icon: '💊', nameKey: 'madinaty.categories.pharmacy' },
-  { id: 'gym', icon: '🏋', nameKey: 'madinaty.categories.gym' },
-  { id: 'repair', icon: '🔧', nameKey: 'madinaty.categories.repair' },
 ];
 
 // Mock User
 export const mockUser: User = {
-  id: 'mock-123',
-  display_name: 'Salar Ali',
+  name: 'Salar Ali',
   email: 'salar.ali@example.com',
-  avatar_url: 'https://i.pravatar.cc/150?u=salarali',
-  role: 'user',
+  avatar: 'https://i.pravatar.cc/150?u=salarali',
 };
 
 // Hero Slides
@@ -962,9 +957,6 @@ export const translations = {
             government: "Government",
             hotels: "Hotels",
             education: "Education",
-            pharmacy: "Pharmacy",
-            gym: "Gym",
-            repair: "Repair",
         }
     },
     shakumaku: {
@@ -1343,9 +1335,6 @@ export const translations = {
             government: "حكومة",
             hotels: "فنادق",
             education: "تعليم",
-            pharmacy: "صيدلية",
-            gym: "صالة رياضية",
-            repair: "تصليح",
         }
     },
     shakumaku: {
@@ -1724,9 +1713,6 @@ export const translations = {
             government: "حکومی",
             hotels: "هۆتێلەکان",
             education: "پەروەردە",
-            pharmacy: "دەرمانخانە",
-            gym: "هۆڵی وەرزش",
-            repair: "چاککردنەوە",
         }
     },
     shakumaku: {

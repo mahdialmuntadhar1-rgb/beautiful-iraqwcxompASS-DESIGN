@@ -1,11 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { CityOnboarding } from './components/CityOnboarding';
-import { MainTabs } from './components/MainTabs';
-import { ShakumakuFilters } from './components/ShakumakuFilters';
-import { MadinatyFilters } from './components/MadinatyFilters';
-import { SearchPortal } from './components/SearchPortal';
-import { BottomNav } from './components/BottomNav';
-import { SubcategoryModal } from './components/SubcategoryModal';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { StoriesRing } from './components/StoriesRing';
@@ -17,24 +10,23 @@ import { CommunityStories } from './components/CommunityStories';
 import { CityGuide } from './components/CityGuide';
 import { BusinessDirectory } from './components/BusinessDirectory';
 import { InclusiveFeatures } from './components/InclusiveFeatures';
-import { AuthSheet } from './components/AuthSheet';
-import { UserProfile } from './components/UserProfile';
-import { PostCard } from './components/PostCard';
-import { CommentSheet } from './components/CommentSheet';
-import { PostCreationBox } from './components/PostCreationBox';
-import { SearchPage } from './components/SearchPage';
+import { AuthModal } from './components/AuthModal';
 import { Dashboard } from './components/Dashboard';
-import { BusinessProfile } from './components/BusinessProfile';
-import { postService, Post } from './services/postService';
-import { RefreshCw } from 'lucide-react';
-import { useAuth } from './hooks/useAuth';
-import { businesses, mockUser } from './constants';
+import { SubcategoryModal } from './components/SubcategoryModal';
+import { SearchPortal } from './components/SearchPortal';
+import { MainTabs } from './components/MainTabs';
+import { MadinatyFilters } from './components/MadinatyFilters';
+import { ShakumakuFilters } from './components/ShakumakuFilters';
+import { CityOnboarding } from './components/CityOnboarding';
+import { BottomNav } from './components/BottomNav';
+import { mockUser, businesses } from './constants';
 import type { User, Category, Subcategory, TabType } from './types';
 import { TranslationProvider, useTranslations } from './hooks/useTranslations';
 
 const MainContent: React.FC = () => {
-  const { t, setLang, lang } = useTranslations();
-  const { user, isLoggedIn, signOut, loading: authLoading } = useAuth();
+  const { t, setLang } = useTranslations();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [page, setPage] = useState<'home' | 'dashboard' | 'listing'>('home');
   const [activeTab, setActiveTab] = useState<TabType>(() => {
@@ -91,33 +83,6 @@ const MainContent: React.FC = () => {
     }
     return false;
   });
-
-  const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(null);
-
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [isPostsLoading, setIsPostsLoading] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const [isCommentSheetOpen, setIsCommentSheetOpen] = useState(false);
-
-  useEffect(() => {
-    if (activeTab === 'shakumaku') {
-      fetchPosts();
-    }
-  }, [activeTab, selectedGovernorate, shakumakuFeedFilter]);
-
-  const fetchPosts = async () => {
-    setIsPostsLoading(true);
-    const { data, error } = await postService.getPosts(selectedGovernorate, shakumakuFeedFilter);
-    setIsPostsLoading(false);
-    if (!error && data) {
-      setPosts(data);
-    }
-  };
-
-  const handleCommentClick = (post: Post) => {
-    setSelectedPost(post);
-    setIsCommentSheetOpen(true);
-  };
 
   useEffect(() => {
     if (highContrast) {
@@ -182,17 +147,18 @@ const MainContent: React.FC = () => {
     }
   }, [activeNav, isLoggedIn]);
 
-  const handleLogout = () => {
-    signOut();
-    setPage('home');
-    setActiveNav('city');
-  };
-  
-  const handleBusinessClick = (id: string) => {
-    setSelectedBusinessId(id);
-    setPage('business');
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setCurrentUser(mockUser);
+    setShowAuthModal(false);
   };
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    setPage('home');
+  };
+  
   const navigateTo = (targetPage: 'home' | 'dashboard') => {
       if (targetPage === 'dashboard' && !isLoggedIn) {
           setShowAuthModal(true);
@@ -235,14 +201,9 @@ const MainContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-navy text-[#e8dcc8] bg-mesh relative overflow-x-hidden">
       {showOnboarding && <CityOnboarding onComplete={handleOnboardingComplete} />}
-      <AuthSheet 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
-        lang={lang}
-      />
       <Header 
         isLoggedIn={isLoggedIn}
-        user={user}
+        user={currentUser}
         onSignIn={() => setShowAuthModal(true)}
         onSignOut={handleLogout}
         onDashboard={() => navigateTo('dashboard')}
@@ -252,107 +213,71 @@ const MainContent: React.FC = () => {
       <main className="relative z-10 max-w-[480px] mx-auto min-h-screen bg-navy/40 backdrop-blur-sm border-x border-white/5 pb-24">
         {page === 'home' && (
           <>
-            {activeNav === 'search' ? (
-              <SearchPage onBusinessClick={handleBusinessClick} />
-            ) : activeNav === 'profile' && isLoggedIn && user ? (
-              <UserProfile 
-                user={user} 
-                onSignOut={handleLogout} 
-                onEdit={() => {}} 
-              />
-            ) : (
-              <>
-                <MainTabs activeTab={activeTab} onTabChange={setActiveTab} />
-                
-                <div key={`${activeTab}-${selectedGovernorate}-${madinatyCategory}-${shakumakuFeedFilter}`} className="tab-content-fade">
-                  {activeTab === 'shakumaku' ? (
-                    <div className="px-4 py-2">
-                      <ShakumakuFilters 
-                        selectedGovernorate={selectedGovernorate}
-                        onGovernorateChange={setSelectedGovernorate}
-                        feedFilter={shakumakuFeedFilter}
-                        onFeedFilterChange={setShakumakuFeedFilter}
-                      />
-                      
-                      <PostCreationBox 
-                        governorate={selectedGovernorate} 
-                        onPostCreated={fetchPosts} 
-                      />
-
-                      {isPostsLoading ? (
-                        <div className="flex justify-center py-20">
-                          <RefreshCw className="animate-spin text-[#d4af37]" size={32} />
-                        </div>
-                      ) : posts.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-20 px-10 text-center space-y-4">
-                          <span className="text-6xl">⚡</span>
-                          <h2 className="text-xl font-bold text-[#d4af37]">{t('common.shakumaku')}</h2>
-                          <p className="text-[#e8dcc8]/60 text-sm">
-                            {lang === 'en' ? 'No posts found in this area.' : 'لا توجد منشورات في هذه المنطقة.'}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          {posts.map(post => (
-                            <PostCard 
-                              key={post.id} 
-                              post={post} 
-                              onCommentClick={handleCommentClick}
-                              onBusinessClick={handleBusinessClick}
-                            />
-                          ))}
-                        </div>
-                      )}
+            <MainTabs activeTab={activeTab} onTabChange={setActiveTab} />
+            
+            <div key={`${activeTab}-${selectedGovernorate}-${madinatyCategory}-${shakumakuFeedFilter}`} className="tab-content-fade">
+              {activeTab === 'shakumaku' ? (
+                <>
+                  <ShakumakuFilters 
+                    selectedGovernorate={selectedGovernorate}
+                    onGovernorateChange={setSelectedGovernorate}
+                    feedFilter={shakumakuFeedFilter}
+                    onFeedFilterChange={setShakumakuFeedFilter}
+                  />
+                  {/* Phase 2 will fill this feed */}
+                  <div className="flex flex-col items-center justify-center py-20 px-10 text-center space-y-4">
+                    <span className="text-6xl">⚡</span>
+                    <h2 className="text-xl font-bold text-[#d4af37]">{t('common.shakumaku')}</h2>
+                    <p className="text-[#e8dcc8]/60 text-sm">Social feed coming in Phase 2...</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <MadinatyFilters 
+                    selectedGovernorate={selectedGovernorate}
+                    onGovernorateChange={setSelectedGovernorate}
+                    selectedCategory={madinatyCategory}
+                    onCategoryChange={setMadinatyCategory}
+                    resultCount={filteredBusinessesCount}
+                  />
+                  
+                  {filteredBusinessesCount === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 px-10 text-center space-y-4">
+                      <span className="text-6xl">🏛️</span>
+                      <p className="text-[#e8dcc8]/60">{t('common.noResults')}</p>
                     </div>
                   ) : (
                     <>
-                      <MadinatyFilters 
-                        selectedGovernorate={selectedGovernorate}
-                        onGovernorateChange={setSelectedGovernorate}
-                        selectedCategory={madinatyCategory}
-                        onCategoryChange={setMadinatyCategory}
-                        resultCount={filteredBusinessesCount}
+                      <HeroSection />
+                      <StoriesRing />
+                      <SearchPortal />
+                      <CategoryGrid 
+                        onCategoryClick={handleCategoryClick} 
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
                       />
-                      
-                      {filteredBusinessesCount === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-20 px-10 text-center space-y-4">
-                          <span className="text-6xl">🏛️</span>
-                          <p className="text-[#e8dcc8]/60">{t('common.noResults')}</p>
-                        </div>
-                      ) : (
-                        <>
-                          <HeroSection />
-                          <StoriesRing />
-                          <SearchPortal />
-                          <CategoryGrid 
-                            onCategoryClick={handleCategoryClick} 
-                            currentPage={currentPage}
-                            setCurrentPage={setCurrentPage}
-                          />
-                          <FeaturedBusinesses 
-                            governorate={selectedGovernorate}
-                            category={madinatyCategory}
-                          />
-                          <PersonalizedEvents 
-                            governorate={selectedGovernorate}
-                          />
-                          <DealsMarketplace 
-                            governorate={selectedGovernorate}
-                          />
-                          <CommunityStories />
-                          <CityGuide />
-                          <BusinessDirectory 
-                            governorate={selectedGovernorate}
-                            category={madinatyCategory}
-                          />
-                        </>
-                      )}
+                      <FeaturedBusinesses 
+                        governorate={selectedGovernorate}
+                        category={madinatyCategory}
+                      />
+                      <PersonalizedEvents 
+                        governorate={selectedGovernorate}
+                      />
+                      <DealsMarketplace 
+                        governorate={selectedGovernorate}
+                      />
+                      <CommunityStories />
+                      <CityGuide />
+                      <BusinessDirectory 
+                        governorate={selectedGovernorate}
+                        category={madinatyCategory}
+                      />
                     </>
                   )}
-                </div>
-                <InclusiveFeatures highContrast={highContrast} setHighContrast={setHighContrast} />
-              </>
-            )}
+                </>
+              )}
+            </div>
+            <InclusiveFeatures highContrast={highContrast} setHighContrast={setHighContrast} />
           </>
         )}
         {page === 'listing' && listingFilter && (
@@ -361,27 +286,16 @@ const MainContent: React.FC = () => {
                 onBack={() => navigateTo('home')} 
             />
         )}
-        {page === 'business' && selectedBusinessId && (
-          <BusinessProfile 
-            businessId={selectedBusinessId} 
-            onBack={() => setPage('home')} 
-          />
-        )}
-        {page === 'dashboard' && <Dashboard user={user!} onLogout={handleLogout} />}
+        {page === 'dashboard' && <Dashboard user={currentUser!} onLogout={handleLogout} />}
       </main>
 
       <BottomNav activeTab={activeNav} onTabChange={setActiveNav} />
 
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} onLogin={handleLogin} />}
       <SubcategoryModal 
         category={selectedCategory} 
         onClose={() => setSelectedCategory(null)}
         onSubcategorySelect={handleSubcategorySelect}
-      />
-
-      <CommentSheet 
-        post={selectedPost}
-        isOpen={isCommentSheetOpen}
-        onClose={() => setIsCommentSheetOpen(false)}
       />
     </div>
   );

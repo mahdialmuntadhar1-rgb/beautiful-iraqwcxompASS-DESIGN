@@ -37,20 +37,7 @@ export const CityOnboarding: React.FC<CityOnboardingProps> = ({ onComplete }) =>
     ku: "هەموو عێراق دەگەڕێم"
   };
 
-  const cityData: Record<string, { emoji: string; gov: Record<string, string> }> = {
-    sulaymaniyah: { emoji: '🏙', gov: { en: 'Sulaymaniyah', ar: 'السليمانية', ku: 'سلێمانی' } },
-    erbil: { emoji: '🌆', gov: { en: 'Erbil', ar: 'أربيل', ku: 'هەولێر' } },
-    baghdad: { emoji: '🌃', gov: { en: 'Baghdad', ar: 'بغداد', ku: 'بەغدا' } },
-    basra: { emoji: '🌊', gov: { en: 'Basra', ar: 'البصرة', ku: 'بەسرە' } },
-    duhok: { emoji: '🏔', gov: { en: 'Duhok', ar: 'دهوك', ku: 'دهۆک' } },
-    kirkuk: { emoji: '⛽', gov: { en: 'Kirkuk', ar: 'كركوك', ku: 'کەرکووک' } },
-    najaf: { emoji: '🕌', gov: { en: 'Najaf', ar: 'النجف', ku: 'نەجەف' } },
-    karbala: { emoji: '🕍', gov: { en: 'Karbala', ar: 'كربلاء', ku: 'کەربەلا' } },
-    mosul: { emoji: '🏛', gov: { en: 'Mosul', ar: 'الموصل', ku: 'مووسڵ' } },
-    anbar: { emoji: '🌴', gov: { en: 'Anbar', ar: 'الأنبار', ku: 'ئەنبار' } },
-  };
-
-  const citiesToShow = governorates.filter(g => g.id !== 'all' && cityData[g.id]);
+  const citiesToShow = governorates.filter(g => g.id !== 'all');
 
   // Direction based on selected language
   const dir = selectedLang === 'en' ? 'ltr' : 'rtl';
@@ -72,7 +59,7 @@ export const CityOnboarding: React.FC<CityOnboardingProps> = ({ onComplete }) =>
               <motion.h1 
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="text-4xl font-bold text-[#d4af37] mb-2 tracking-tighter"
+                className="text-4xl font-bold text-[#d4af37] mb-4 tracking-tighter"
               >
                 IRAQ COMPASS
               </motion.h1>
@@ -87,7 +74,7 @@ export const CityOnboarding: React.FC<CityOnboardingProps> = ({ onComplete }) =>
             </div>
 
             {/* Language Selector */}
-            <div className="flex gap-3 mb-10">
+            <div className="flex gap-3 mb-12">
               {(['en', 'ar', 'ku'] as const).map((lang) => (
                 <button
                   key={lang}
@@ -114,20 +101,18 @@ export const CityOnboarding: React.FC<CityOnboardingProps> = ({ onComplete }) =>
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleCitySelect(city.id)}
-                  className={`relative p-5 rounded-2xl border transition-all text-center flex flex-col items-center justify-center min-h-[130px] group ${
+                  className={`relative p-6 rounded-2xl border transition-all text-center flex flex-col items-center justify-center min-h-[140px] group ${
                     selectedCity === city.id
                       ? 'bg-[#d4af37]/20 border-[#d4af37] shadow-[0_0_30px_rgba(212,175,55,0.3)]'
                       : 'bg-white/5 border-white/10 hover:border-white/30'
                   }`}
                 >
-                  <span className="text-3xl mb-2 group-hover:scale-110 transition-transform">
-                    {cityData[city.id].emoji}
-                  </span>
-                  <span className={`text-base font-bold leading-tight ${selectedCity === city.id ? 'text-[#d4af37]' : 'text-[#e8dcc8]'}`}>
+                  <span className="text-3xl mb-3 group-hover:scale-110 transition-transform">📍</span>
+                  <span className={`text-lg font-bold leading-tight ${selectedCity === city.id ? 'text-[#d4af37]' : 'text-[#e8dcc8]'}`}>
                     {city.name[selectedLang]}
                   </span>
-                  <span className="text-[10px] text-[#e8dcc8]/40 uppercase tracking-widest mt-1">
-                    {cityData[city.id].gov[selectedLang]}
+                  <span className="text-[10px] text-[#e8dcc8]/40 uppercase tracking-[0.2em] mt-2">
+                    {city.id}
                   </span>
                   
                   {selectedCity === city.id && (
