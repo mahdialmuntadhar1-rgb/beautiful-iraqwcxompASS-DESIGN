@@ -1,20 +1,69 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Beautiful Iraq Compass Design
 
-# Run and deploy your AI Studio app
+  A modern, beautiful Iraqi city guide and business directory app with glassmorphism UI, bilingual (Arabic/English) support, and AI-powered features.
 
-This contains everything you need to run your app locally.
+  ## Branch Strategy
 
-View your app in AI Studio: https://ai.studio/apps/da4e9d22-af92-4997-8a1a-ae36acf711a0
+  - `main` → AI Studio generated code (source of truth)
+  - `production` → Stable, fixed, deployment-ready version
 
-## Run Locally
+  ## Project Structure
 
-**Prerequisites:**  Node.js
+  ```
+  ├── index.tsx          # App entry point
+  ├── App.tsx            # Root component
+  ├── components/        # UI components
+  │   ├── Header.tsx
+  │   ├── HeroSection.tsx
+  │   ├── Dashboard.tsx
+  │   ├── BusinessDirectory.tsx
+  │   └── ...
+  ├── hooks/             # Custom React hooks
+  ├── constants.tsx      # App constants
+  ├── types.ts           # TypeScript types
+  ├── index.css          # Global styles
+  ├── vite.config.ts
+  └── tsconfig.json
+  ```
 
+  ## Environment Variables
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+  Copy `.env.example` to `.env` (or `.env.local`) and fill in your values:
+
+  ```
+  GEMINI_API_KEY=    # Your Google Gemini API key
+  ```
+
+  ## Run on Replit
+
+  1. Import this repository into Replit (use the production branch).
+  2. Go to **Secrets** and add:
+     - `GEMINI_API_KEY`
+  3. Run `npm install` in the Shell if not auto-installed.
+  4. Click **Run** — starts via `npm run dev`.
+
+  ## Commands
+
+  | Command          | Description                      |
+  |------------------|----------------------------------|
+  | `npm run dev`    | Start development server (Vite)  |
+  | `npm run build`  | Build for production             |
+  | `npm run preview`| Preview production build locally |
+  | `npm run lint`   | TypeScript type check            |
+
+  ## Deploy on Replit
+
+  1. Set **build command** to `npm run build`
+  2. Set **run command** to `npx serve dist -s` (serves static build)
+  3. Add environment variables to Replit Secrets
+
+  ## Features
+
+  - Glassmorphism dark UI design
+  - Arabic/English bilingual support with RTL layout
+  - City guide and business directory
+  - Community stories and events
+  - Deals marketplace
+  - High contrast accessibility mode
+  - AI-powered search and recommendations (requires Gemini API key)
+  
