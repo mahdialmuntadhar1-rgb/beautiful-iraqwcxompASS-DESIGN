@@ -1,0 +1,7 @@
+run = "npm run dev"
+
+  [deployment]
+  run = ["sh", "-c", "npm run build && npx serve dist -s"]
+  build = ["sh", "-c", "npm run build"]
+  deploymentTarget = "static"
+  
